@@ -1,0 +1,389 @@
+prac1
+
+package com.example.riddhi1
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.riddhi1.ui.theme.Riddhi1Theme
+
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+    }
+}
+/*
+enableEdgeToEdge()
+setContent {
+    Riddhi1Theme {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            Greeting(
+                name = "Android",
+                modifier = Modifier.padding(innerPadding)
+            )
+        }
+    }
+}
+}
+}
+
+@Composable
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+Text(
+text = "Hello $name!",
+modifier = modifier
+)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+Riddhi1Theme {
+Greeting("Android")
+}
+}*/
+
+activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        android:textSize="30sp"
+        android:layout_gravity="center"
+        android:layout_margin="100dp"/>
+</LinearLayout>
+
+prac sqlite#####
+
+MainActivity.kt
+package com.example.sqlitetutorial
+
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import androidx.activity.ComponentActivity
+
+
+class MainActivity : ComponentActivity() {
+
+    private lateinit var dbHelper: UsersDBHelper
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        dbHelper = UsersDBHelper(this)
+    }
+
+    fun addUser(view: View) {
+        val userid = findViewById<EditText>(R.id.edittext_userid).text.toString()
+        val name = findViewById<EditText>(R.id.edittext_name).text.toString()
+        val age = findViewById<EditText>(R.id.edittext_age).text.toString()
+
+        val result = dbHelper.insertUser(UserModel(userid, name, age))
+        findViewById<TextView>(R.id.textview_result).text = "Added user: $result"
+        findViewById<LinearLayout>(R.id.ll_entries).removeAllViews()
+    }
+
+    fun deleteUser(view: View) {
+        val userid = findViewById<EditText>(R.id.edittext_userid).text.toString()
+        val result = dbHelper.deleteUser(userid)
+        findViewById<TextView>(R.id.textview_result).text = "Deleted user: $result"
+        findViewById<LinearLayout>(R.id.ll_entries).removeAllViews()
+    }
+
+    fun showAllUsers(view: View) {
+        val users = dbHelper.readAllUsers()
+        val layout = findViewById<LinearLayout>(R.id.ll_entries)
+        layout.removeAllViews()
+
+        users.forEach {
+            val tv = TextView(this)
+            tv.textSize = 18f
+            tv.text = "${it.name} - ${it.age}"
+            layout.addView(tv)
+        }
+
+        findViewById<TextView>(R.id.textview_result).text =
+            "Fetched ${users.size} users"
+    }
+}
+
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SQLite Tutorial - User Management"
+        android:textSize="20sp"
+        android:padding="10dp" />
+
+    <EditText
+        android:id="@+id/edittext_userid"
+        android:hint="User ID"
+        android:inputType="text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/edittext_name"
+        android:hint="User Name"
+        android:inputType="textPersonName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/edittext_age"
+        android:hint="User Age"
+        android:inputType="number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_add_user"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Add"
+            android:onClick="addUser"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/button_delete_user"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Delete"
+            android:onClick="deleteUser"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/button_show_all"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Show All"
+            android:onClick="showAllUsers"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textview_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/ll_entries"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
+
+
+DBContract.kt
+package com.example.sqlitetutorial
+
+import android.provider.BaseColumns
+
+object DBContract {
+
+    class UserEntry : BaseColumns {
+        companion object {
+            const val TABLE_NAME = "users"
+            const val COLUMN_USER_ID = "userid"
+            const val COLUMN_NAME = "name"
+            const val COLUMN_AGE = "age"
+        }
+    }
+}
+
+UserDBHelper.kt
+package com.example.sqlitetutorial
+
+import android.content.ContentValues
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+
+class UsersDBHelper(context: Context) :
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+
+    override fun onCreate(db: SQLiteDatabase) {
+        db.execSQL(SQL_CREATE_ENTRIES)
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL(SQL_DELETE_ENTRIES)
+        onCreate(db)
+    }
+
+    fun insertUser(user: UserModel): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(DBContract.UserEntry.COLUMN_USER_ID,user.userId)
+            put(DBContract.UserEntry.COLUMN_NAME, user.name)
+            put(DBContract.UserEntry.COLUMN_AGE, user.age)
+        }
+        return db.insert(DBContract.UserEntry.TABLE_NAME, null, values) != -1L
+    }
+
+    fun deleteUser(userid: String): Boolean {
+        val db = writableDatabase
+        val rows = db.delete(
+            DBContract.UserEntry.TABLE_NAME,
+            "${DBContract.UserEntry.COLUMN_USER_ID}=?",
+            arrayOf(userid)
+        )
+        return rows > 0
+    }
+
+    fun readAllUsers(): ArrayList<UserModel> {
+        val users = ArrayList<UserModel>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM ${DBContract.UserEntry.TABLE_NAME}", null)
+
+        cursor.use {
+            while (it.moveToNext()) {
+                users.add(
+                    UserModel(
+                        it.getString(it.getColumnIndexOrThrow(DBContract.UserEntry.COLUMN_USER_ID)),
+                        it.getString(it.getColumnIndexOrThrow(DBContract.UserEntry.COLUMN_NAME)),
+                        it.getString(it.getColumnIndexOrThrow(DBContract.UserEntry.COLUMN_AGE))
+                    )
+                )
+            }
+        }
+        return users
+    }
+
+    companion object {
+        const val DATABASE_VERSION = 1
+        const val DATABASE_NAME = "Users.db"
+
+        const val SQL_CREATE_ENTRIES =
+            "CREATE TABLE users (userid TEXT PRIMARY KEY, name TEXT, age TEXT)"
+
+        const val SQL_DELETE_ENTRIES =
+            "DROP TABLE IF EXISTS users"
+    }
+}
+
+UserModel.kt
+package com.example.sqlitetutorial
+
+data class UserModel(
+    val userId: String,
+    val name: String,
+    val age: String
+)
+
+Prac2
+
+package com.example.mansi1
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.mansi1.ui.theme.Mansi1Theme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+    }
+}
+
+        /*
+        enableEdgeToEdge()
+        setContent {
+            Mansi1Theme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Greeting(
+                        name = "Android",
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = "Hello $name!",
+        modifier = modifier
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    Mansi1Theme {
+        Greeting("Android")
+    }
+}*/
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/baby"
+    tools:context=".MainActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:textSize="50sp"
+        android:textColor="@color/black"
+        android:layout_gravity="center"
+        android:layout_margin="50sp"/>
+</LinearLayout>
+
+
+
